@@ -64,25 +64,40 @@ VITE_APPWRITE_SAVES_COLLECTION_ID=
 4. Run the application:
   ```bash
   npm start
-
+```
 
 Open http://localhost:3000 or http://localhost:5173 in your browser.
 
 
 # Screenshots
-## Home Page
 
-## Create Post
+### Sign Up
+![Sign_up](https://github.com/user-attachments/assets/3002e530-e33f-40f9-b840-0e691c9de770)
 
-## Profile Page
+### Sign In
+![Sign_in](https://github.com/user-attachments/assets/4bce8a31-32e3-4400-b706-7cbdc29ec76e)
+
+### Home
+![Home](https://github.com/user-attachments/assets/a0e9e49d-58d7-4a3e-81d2-586843fec5b3)
+
+### Explore
+![Explore](https://github.com/user-attachments/assets/da422886-09f9-4c7f-b197-c4b76ff2b033)
+
+### People
+![People](https://github.com/user-attachments/assets/fa768453-2a95-4270-9465-72690c42543c)
+
+### Saved Posts
+![Saved](https://github.com/user-attachments/assets/6e5fdb01-1d3f-4fb8-9dba-b467c389ff17)
+
+### Create Post
+![Create_Post](https://github.com/user-attachments/assets/9e8409b0-2d4b-4900-8d46-19088d57a8c8)
+
+### Profile Page
+![Profile_Page](https://github.com/user-attachments/assets/d7bc951e-d951-49ca-9a70-aa382e3b11a9)
 
 # Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
-
-# License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
 
 # Acknowledgements
 
