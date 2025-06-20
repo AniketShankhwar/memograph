@@ -1,4 +1,3 @@
-import { Models } from "appwrite";
 import { storage, appwriteConfig } from "@/lib/appwrite/config";
 import { GridPostList, Loader } from "@/components/shared";
 import { useGetCurrentUser } from "@/lib/react-query/queries";

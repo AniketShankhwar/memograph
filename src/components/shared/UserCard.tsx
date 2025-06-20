@@ -14,7 +14,9 @@ const UserCard = ({ user }: UserCardProps) => {
       <img
         src={
           user.imageId
-            ? storage.getFileView(appwriteConfig.storageId, user.imageId)
+            ? storage
+                .getFileView(appwriteConfig.storageId, user.imageId)
+                .toString()
             : "/assets/icons/profile-placeholder.svg"
         }
         alt="creator"
