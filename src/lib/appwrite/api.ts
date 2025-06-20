@@ -434,6 +434,26 @@ export async function getRecentPosts() {
   }
 }
 
+// ============================== GET USER'S SAVED POSTS (UPDATED)
+export async function getUserSavedPosts(userId: string) {
+  try {
+    return await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      [
+        Query.equal("user", userId),
+        Query.orderDesc("$createdAt")
+      ],
+      [
+        'post',
+        'post.creator'
+      ]
+    );
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 // ============================================================
 // USER
 // ============================================================
