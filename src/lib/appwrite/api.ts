@@ -444,10 +444,6 @@ export async function getUserSavedPosts(userId: string) {
         Query.equal("user", userId),
         Query.orderDesc("$createdAt")
       ],
-      [
-        'post',
-        'post.creator'
-      ]
     );
   } catch (error) {
     console.log(error);
