@@ -1,9 +1,8 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-
 import { Button } from "@/components/ui";
 import { Loader } from "@/components/shared";
 import { GridPostList, PostStats } from "@/components/shared";
-
+import { storage, appwriteConfig } from "@/lib/appwrite/config";
 import {
   useGetPostById,
   useGetUserPosts,
@@ -38,7 +37,8 @@ const PostDetails = () => {
         <Button
           onClick={() => navigate(-1)}
           variant="ghost"
-          className="shad-button_ghost">
+          className="shad-button_ghost"
+        >
           <img
             src={"/assets/icons/back.svg"}
             alt="back"
@@ -54,8 +54,15 @@ const PostDetails = () => {
       ) : (
         <div className="post_details-card">
           <img
-            src={post?.imageUrl}
-            alt="creator"
+            src={
+              post.imageId
+                ? storage.getFileView(
+                    appwriteConfig.storageId,
+                    post.imageId
+                  ).toString()
+                : post.imageUrl || "/assets/icons/profile-placeholder.svg"
+            }
+            alt="post"
             className="post_details-img"
           />
 
@@ -63,11 +70,17 @@ const PostDetails = () => {
             <div className="flex-between w-full">
               <Link
                 to={`/profile/${post?.creator.$id}`}
-                className="flex items-center gap-3">
+                className="flex items-center gap-3"
+              >
                 <img
                   src={
-                    post?.creator.imageUrl ||
-                    "/assets/icons/profile-placeholder.svg"
+                    post.creator.imageId
+                      ? storage.getFileView(
+                          appwriteConfig.storageId,
+                          post.creator.imageId
+                        ).toString()
+                      : post.creator.imageUrl ||
+                        "/assets/icons/profile-placeholder.svg"
                   }
                   alt="creator"
                   className="w-8 h-8 lg:w-12 lg:h-12 rounded-full"
@@ -91,7 +104,8 @@ const PostDetails = () => {
               <div className="flex-center gap-4">
                 <Link
                   to={`/update-post/${post?.$id}`}
-                  className={`${user.id !== post?.creator.$id && "hidden"}`}>
+                  className={`${user.id !== post?.creator.$id && "hidden"}`}
+                >
                   <img
                     src={"/assets/icons/edit.svg"}
                     alt="edit"
@@ -105,7 +119,8 @@ const PostDetails = () => {
                   variant="ghost"
                   className={`ost_details-delete_btn ${
                     user.id !== post?.creator.$id && "hidden"
-                  }`}>
+                  }`}
+                >
                   <img
                     src={"/assets/icons/delete.svg"}
                     alt="delete"
@@ -124,7 +139,8 @@ const PostDetails = () => {
                 {post?.tags.map((tag: string, index: string) => (
                   <li
                     key={`${tag}${index}`}
-                    className="text-light-3 small-regular">
+                    className="text-light-3 small-regular"
+                  >
                     #{tag}
                   </li>
                 ))}

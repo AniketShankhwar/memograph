@@ -1,6 +1,7 @@
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 
+import { storage, appwriteConfig } from "@/lib/appwrite/config";
 import { PostStats } from "@/components/shared";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
@@ -12,7 +13,17 @@ type PostCardProps = {
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
 
-  if (!post.creator) return;
+  if (!post.creator) return null;
+
+  // Get creator's image URL
+  const creatorImage = post.creator.imageId
+    ? storage.getFileView(appwriteConfig.storageId, post.creator.imageId)
+    : post.creator.imageUrl || "/assets/icons/profile-placeholder.svg";
+
+  // Get post image URL
+  const postImage = post.imageId
+    ? storage.getFileView(appwriteConfig.storageId, post.imageId)
+    : post.imageUrl || "/assets/icons/profile-placeholder.svg";
 
   return (
     <div className="post-card">
@@ -20,10 +31,7 @@ const PostCard = ({ post }: PostCardProps) => {
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.creator.$id}`}>
             <img
-              src={
-                post.creator?.imageUrl ||
-                "/assets/icons/profile-placeholder.svg"
-              }
+              src={creatorImage}
               alt="creator"
               className="w-12 lg:h-12 rounded-full"
             />
@@ -62,7 +70,9 @@ const PostCard = ({ post }: PostCardProps) => {
           <p>{post.caption}</p>
           <ul className="flex gap-1 mt-2">
             {post.tags.map((tag: string, index: string) => (
-              <li key={`${tag}${index}`} className="text-light-3 small-regular">
+              <li
+                key={`${tag}${index}`}
+                className="text-light-3 small-regular">
                 #{tag}
               </li>
             ))}
@@ -70,7 +80,7 @@ const PostCard = ({ post }: PostCardProps) => {
         </div>
 
         <img
-          src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
+          src={postImage}
           alt="post image"
           className="post-card_img"
         />

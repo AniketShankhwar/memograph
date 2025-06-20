@@ -6,12 +6,12 @@ import {
   useParams,
   useLocation,
 } from "react-router-dom";
-
 import { Button } from "@/components/ui";
 import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
 import { useGetUserById } from "@/lib/react-query/queries";
 import { GridPostList, Loader } from "@/components/shared";
+import { storage, appwriteConfig } from "@/lib/appwrite/config";
 
 interface StabBlockProps {
   value: string | number;
@@ -30,23 +30,25 @@ const Profile = () => {
   const { user } = useUserContext();
   const { pathname } = useLocation();
 
-  const { data: currentUser } = useGetUserById(id || "");
+  const { data: currentUser, isLoading } = useGetUserById(id || "");
 
-  if (!currentUser)
+  if (isLoading || !currentUser)
     return (
       <div className="flex-center w-full h-full">
         <Loader />
       </div>
     );
 
+  const profileImage = currentUser.imageId
+    ? storage.getFileView(appwriteConfig.storageId, currentUser.imageId)
+    : currentUser.imageUrl || "/assets/icons/profile-placeholder.svg";
+
   return (
     <div className="profile-container">
       <div className="profile-inner_container">
         <div className="flex xl:flex-row flex-col max-xl:items-center flex-1 gap-7">
           <img
-            src={
-              currentUser.imageUrl || "/assets/icons/profile-placeholder.svg"
-            }
+            src={profileImage}
             alt="profile"
             className="w-28 h-28 lg:h-36 lg:w-36 rounded-full"
           />
@@ -100,39 +102,37 @@ const Profile = () => {
 
       {currentUser.$id === user.id && (
         <div className="flex max-w-5xl w-full">
-        <Link
-          to={`/profile/${id}`}
-          className={`profile-tab rounded-l-lg ${
-            pathname === `/profile/${id}` && "!bg-[#5CCB3D]"
-          }`}
-        >
-          <img
-            src={"/assets/icons/posts.svg"}
-            alt="posts"
-            width={20}
-            height={20}
-            className={pathname === `/profile/${id}` ? "invert-white" : ""}
-          />
-          Posts
-        </Link>
-        <Link
-          to={`/profile/${id}/liked-posts`}
-          className={`profile-tab rounded-r-lg ${
-            pathname === `/profile/${id}/liked-posts` && "!bg-[#5CCB3D]"
-          }`}
-        >
-          <img
-            src={"/assets/icons/like.svg"}
-            alt="like"
-            width={20}
-            height={20}
-            className={
-              pathname === `/profile/${id}/liked-posts` ? "invert-white" : ""
-            }
-          />
-          Liked Posts
-        </Link>
-      </div>
+          <Link
+            to={`/profile/${id}`}
+            className={`profile-tab rounded-l-lg ${
+              pathname === `/profile/${id}` && "!bg-[#5CCB3D]"
+            }`}>
+            <img
+              src={"/assets/icons/posts.svg"}
+              alt="posts"
+              width={20}
+              height={20}
+              className={pathname === `/profile/${id}` ? "invert-white" : ""}
+            />
+            Posts
+          </Link>
+          <Link
+            to={`/profile/${id}/liked-posts`}
+            className={`profile-tab rounded-r-lg ${
+              pathname === `/profile/${id}/liked-posts` && "!bg-[#5CCB3D]"
+            }`}>
+            <img
+              src={"/assets/icons/like.svg"}
+              alt="like"
+              width={20}
+              height={20}
+              className={
+                pathname === `/profile/${id}/liked-posts` ? "invert-white" : ""
+              }
+            />
+            Liked Posts
+          </Link>
+        </div>
       )}
 
       <Routes>

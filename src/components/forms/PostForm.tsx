@@ -1,8 +1,10 @@
+import * as React from "react";
 import * as z from "zod";
 import { Models } from "appwrite";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { storage, appwriteConfig } from "@/lib/appwrite/config";
 
 import {
   Form,
@@ -15,11 +17,11 @@ import {
   Input,
   Textarea,
 } from "@/components/ui";
-import { PostValidation } from "@/lib/validation";
+import { FileUploader, Loader } from "@/components/shared";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserContext } from "@/context/AuthContext";
-import { FileUploader, Loader } from "@/components/shared";
 import { useCreatePost, useUpdatePost } from "@/lib/react-query/queries";
+import { PostValidation } from "@/lib/validation";
 
 type PostFormProps = {
   post?: Models.Document;
@@ -40,6 +42,11 @@ const PostForm = ({ post, action }: PostFormProps) => {
     },
   });
 
+  // Generate image URL for existing post
+  const existingImageUrl = post?.imageId
+    ? storage.getFileView(appwriteConfig.storageId, post.imageId).toString()
+    : post?.imageUrl || "";
+
   // Query
   const { mutateAsync: createPost, isLoading: isLoadingCreate } =
     useCreatePost();
@@ -54,7 +61,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
         ...value,
         postId: post.$id,
         imageId: post.imageId,
-        imageUrl: post.imageUrl,
+        imageUrl: existingImageUrl,
       });
 
       if (!updatedPost) {
@@ -83,7 +90,8 @@ const PostForm = ({ post, action }: PostFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleSubmit)}
-        className="flex flex-col gap-9 w-full  max-w-5xl">
+        className="flex flex-col gap-9 w-full max-w-5xl"
+      >
         <FormField
           control={form.control}
           name="caption"
@@ -110,7 +118,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
               <FormControl>
                 <FileUploader
                   fieldChange={field.onChange}
-                  mediaUrl={post?.imageUrl}
+                  mediaUrl={existingImageUrl}
                 />
               </FormControl>
               <FormMessage className="shad-form_message" />
@@ -157,13 +165,15 @@ const PostForm = ({ post, action }: PostFormProps) => {
           <Button
             type="button"
             className="shad-button_dark_4"
-            onClick={() => navigate(-1)}>
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </Button>
           <Button
             type="submit"
             className="shad-button_primary whitespace-nowrap"
-            disabled={isLoadingCreate || isLoadingUpdate}>
+            disabled={isLoadingCreate || isLoadingUpdate}
+          >
             {(isLoadingCreate || isLoadingUpdate) && <Loader />}
             {action} Post
           </Button>

@@ -1,15 +1,17 @@
 import { useNavigate } from "react-router-dom";
 import { createContext, useContext, useEffect, useState } from "react";
+import { appwriteConfig, storage } from "@/lib/appwrite/config";
 
 import { IUser } from "@/types";
 import { getCurrentUser } from "@/lib/appwrite/api";
 
-export const INITIAL_USER = {
+export const INITIAL_USER: IUser = {
   id: "",
   name: "",
   username: "",
   email: "",
   imageUrl: "",
+  imageId: "",
   bio: "",
 };
 
@@ -49,14 +51,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           name: currentAccount.name,
           username: currentAccount.username,
           email: currentAccount.email,
-          imageUrl: currentAccount.imageUrl,
-          bio: currentAccount.bio,
+          imageId: currentAccount.imageId || "",
+          imageUrl: currentAccount.imageId
+            ? storage.getFileView(
+                appwriteConfig.storageId,
+                currentAccount.imageId
+              ).toString()
+            : currentAccount.imageUrl || "",
+          bio: currentAccount.bio || "",
         });
         setIsAuthenticated(true);
-
         return true;
       }
-
       return false;
     } catch (error) {
       console.error(error);

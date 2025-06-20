@@ -28,9 +28,10 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const { data: currentUser } = useGetCurrentUser();
 
-  const savedPostRecord = currentUser?.save.find(
-    (record: Models.Document) => record.post.$id === post.$id
-  );
+  // Fixed: Filter out records with null post before searching
+  const savedPostRecord = currentUser?.save
+    .filter((record: Models.Document) => record.post !== null)
+    .find((record: Models.Document) => record.post.$id === post.$id);
 
   useEffect(() => {
     setIsSaved(!!savedPostRecord);
@@ -60,7 +61,8 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
     if (savedPostRecord) {
       setIsSaved(false);
-      return deleteSavePost(savedPostRecord.$id);
+      deleteSavePost(savedPostRecord.$id);
+      return;
     }
 
     savePost({ userId: userId, postId: post.$id });
@@ -73,7 +75,8 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   return (
     <div
-      className={`flex justify-between items-center z-20 ${containerStyles}`}>
+      className={`flex justify-between items-center z-20 ${containerStyles}`}
+    >
       <div className="flex gap-2 mr-5">
         <img
           src={`${
@@ -93,7 +96,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
       <div className="flex gap-2">
         <img
           src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
-          alt="share"
+          alt="save"
           width={20}
           height={20}
           className="cursor-pointer"

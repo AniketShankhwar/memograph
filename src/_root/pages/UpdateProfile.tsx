@@ -14,6 +14,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { Textarea, Input, Button } from "@/components/ui";
 import { ProfileUploader, Loader } from "@/components/shared";
+import { storage, appwriteConfig } from "@/lib/appwrite/config";
 
 import { ProfileValidation } from "@/lib/validation";
 import { useUserContext } from "@/context/AuthContext";
@@ -35,7 +36,6 @@ const UpdateProfile = () => {
     },
   });
 
-  // Queries
   const { data: currentUser } = useGetUserById(id || "");
   const { mutateAsync: updateUser, isLoading: isLoadingUpdate } =
     useUpdateUser();
@@ -47,7 +47,6 @@ const UpdateProfile = () => {
       </div>
     );
 
-  // Handler
   const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
     const updatedUser = await updateUser({
       userId: currentUser.$id,
@@ -90,7 +89,8 @@ const UpdateProfile = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(handleUpdate)}
-            className="flex flex-col gap-7 w-full mt-4 max-w-5xl">
+            className="flex flex-col gap-7 w-full mt-4 max-w-5xl"
+          >
             <FormField
               control={form.control}
               name="file"
@@ -99,7 +99,11 @@ const UpdateProfile = () => {
                   <FormControl>
                     <ProfileUploader
                       fieldChange={field.onChange}
-                      mediaUrl={currentUser.imageUrl}
+                      mediaUrl={
+                        currentUser.imageId
+                          ? storage.getFileView(appwriteConfig.storageId, currentUser.imageId)
+                          : currentUser.imageUrl || ""
+                      }
                     />
                   </FormControl>
                   <FormMessage className="shad-form_message" />
@@ -180,13 +184,15 @@ const UpdateProfile = () => {
               <Button
                 type="button"
                 className="shad-button_dark_4"
-                onClick={() => navigate(-1)}>
+                onClick={() => navigate(-1)}
+              >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 className="shad-button_primary whitespace-nowrap"
-                disabled={isLoadingUpdate}>
+                disabled={isLoadingUpdate}
+              >
                 {isLoadingUpdate && <Loader />}
                 Update Profile
               </Button>
